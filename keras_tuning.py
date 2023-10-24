@@ -38,13 +38,13 @@ tuner = kt.Hyperband(model_builder,
                      objective='val_accuracy',
                      max_epochs=10,
                      factor=3,
-                     directory='/home/amit/',
+                     directory='/home/user/',
                      project_name='microSeisms6')
 
 stop_early = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5)
 
 with tf.device('/device:GPU:2'):
-    tuner.search(np.append(X_micro,X_nomicro,axis=0).reshape(4100+4000,756,120), np.append(X_label_1,X_label_0,axis=0),
+    tuner.search(np.append(X_pos,X_neg,axis=0).reshape(4100+4000,756,120), np.append(X_label_1,X_label_0,axis=0),
                  epochs=50, validation_split=0.2, callbacks=[stop_early])#
 
     # Get the optimal hyperparameters
@@ -72,7 +72,7 @@ print('Best epoch: %d' % (best_epoch,))
 hypermodel = tuner.hypermodel.build(best_hps)
 
 # Retrain the model
-hypermodel.fit(np.append(X_micro,X_nomicro,axis=0).reshape(2*(40*100+780),756,120), np.append(X_label_1,X_label_0,axis=0),
+hypermodel.fit(np.append(X_pos,X_neg,axis=0).reshape(2*(40*100+780),756,120), np.append(X_label_1,X_label_0,axis=0),
                epochs=best_epoch, validation_split=0.2)
 
 
